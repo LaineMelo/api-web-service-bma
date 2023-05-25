@@ -58,7 +58,13 @@ var app = builder.Build();
 app.UseCors();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+
+app.UseSwaggerUI((c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Banco de Alimentos API v1");
+}));
+
+app.UseRouting();
 
 app.UseHttpsRedirection();
 
