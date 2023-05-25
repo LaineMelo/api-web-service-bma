@@ -57,6 +57,10 @@ var app = builder.Build();
 
 app.UseCors();
 
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
 app.UseSwagger();
 
 app.UseSwaggerUI((c =>
@@ -66,10 +70,9 @@ app.UseSwaggerUI((c =>
 
 app.UseRouting();
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();
