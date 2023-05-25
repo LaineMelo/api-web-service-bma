@@ -1,0 +1,136 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "api-back",
+      "metadata": {
+        "_parameterType": "resourceGroup",
+        "description": "Nome do grupo de recursos do recurso. É recomendável colocar os recursos no mesmo grupo de recursos para melhor acompanhamento."
+      }
+    },
+    "resourceGroupLocation": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "_parameterType": "location",
+        "description": "Local do grupo de recursos. Os grupos de recursos podem ter um local diferente do local dos recursos."
+      }
+    },
+    "resourceLocation": {
+      "type": "string",
+      "defaultValue": "[parameters('resourceGroupLocation')]",
+      "metadata": {
+        "_parameterType": "location",
+        "description": "Local do recurso. Por padrão, use o local do grupo de recursos, a menos que não haja suporte para o provedor de recursos."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "name": "[parameters('resourceGroupName')]",
+      "location": "[parameters('resourceGroupLocation')]",
+      "apiVersion": "2019-10-01"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('echo-api', subscription().subscriptionId)))]",
+      "resourceGroup": "[parameters('resourceGroupName')]",
+      "apiVersion": "2019-10-01",
+      "dependsOn": [
+        "[parameters('resourceGroupName')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
+            {
+              "name": "apibeneficiarios",
+              "type": "Microsoft.ApiManagement/service",
+              "location": "[parameters('resourceLocation')]",
+              "properties": {
+                "publisherEmail": "elaine.melo.1353338@sga.pucminas.br",
+                "publisherName": "cadbeneficiarios",
+                "notificationSenderEmail": "apimgmt-noreply@mail.windowsazure.com",
+                "hostnameConfigurations": [
+                  {
+                    "type": "Proxy",
+                    "hostName": "apibeneficiarios.azure-api.net",
+                    "encodedCertificate": null,
+                    "keyVaultId": null,
+                    "certificatePassword": null,
+                    "negotiateClientCertificate": false,
+                    "certificate": null,
+                    "defaultSslBinding": true
+                  }
+                ],
+                "publicIPAddresses": [
+                  "20.242.167.197"
+                ],
+                "privateIPAddresses": null,
+                "additionalLocations": null,
+                "virtualNetworkConfiguration": null,
+                "customProperties": {
+                  "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11": "false",
+                  "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10": "false",
+                  "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls11": "false",
+                  "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls10": "false",
+                  "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Ssl30": "false",
+                  "Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2": "false",
+                  "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168": "false",
+                  "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Ssl30": "false"
+                },
+                "virtualNetworkType": "None",
+                "certificates": null,
+                "disableGateway": false,
+                "apiVersionConstraint": {
+                  "minApiVersion": null
+                }
+              },
+              "sku": {
+                "name": "Developer",
+                "capacity": 1
+              },
+              "apiVersion": "2019-12-01"
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/apis",
+              "name": "apibeneficiarios/echo-api",
+              "properties": {
+                "displayName": "Banco de Alimentos",
+                "apiRevision": "1",
+                "description": "Esse é um Sistema de cadastro baseado nas especificações OpenAPI 3.0. O Banco de Alimentos é um sistema com o objetivo de facilitar e agilizar o processo de cadastro de entrega de cestas básicas para famílias que encontram-se em situação de vulnerabilidade social. Projeto criado e desenvolvido pelas alunas: Amanda Paloma e Elaine Souza para o 4º período do curso de Sistemas para Internet, ministrado na Puc Minas EAD.",
+                "subscriptionRequired": true,
+                "serviceUrl": "https://cadbeneficiarios.azurewebsites.net",
+                "path": "echo",
+                "protocols": [
+                  "https"
+                ],
+                "authenticationSettings": {
+                  "oAuth2": null,
+                  "openid": null
+                },
+                "subscriptionKeyParameterNames": {
+                  "header": "Ocp-Apim-Subscription-Key",
+                  "query": "subscription-key"
+                },
+                "isCurrent": true
+              },
+              "apiVersion": "2019-12-01",
+              "dependsOn": [
+                "apibeneficiarios"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "_dependencyType": "apis.azure"
+  }
+}
